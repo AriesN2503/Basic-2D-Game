@@ -29,6 +29,8 @@ public class My2DGame {
 
         window.setLocationRelativeTo(null); //Not specify the location for the winfdow, and that make it at the center of the screen
         window.setVisible(true);
+
+        gamePanel.startGameThread();
     }
     
 }
