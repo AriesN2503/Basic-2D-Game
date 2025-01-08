@@ -1,6 +1,9 @@
 package my2dgame;
 
 import javax.swing.JPanel;
+
+import entity.Player;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -29,10 +32,12 @@ public class GamePanel extends JPanel implements Runnable {
     // KEY HANDLER
     KeyHandler keyH = new KeyHandler();
 
+    Player player = new Player(this, keyH);
+
     // Set player's default position
     int playerX = 100;
     int playerY = 100;
-    int playerSpeed = 10; // px
+    int playerSpeed = 4; // px
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // set size for this class (JPanel)
@@ -48,39 +53,78 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     // FPS
-    final int FPS = 60;
+    int FPS = 60;
 
     // LOOP
+    // @Override
+    // public void run() {
+
+    // double drawInterval = 1000000000 / FPS; // 0.01666 seconds
+    // double nextDrawTime = System.nanoTime() + drawInterval;
+
+    // while (gameThread != null) {
+    // long currentTime = System.nanoTime(); // basic it is a time in nanoseconds
+    // System.err.println("Current Time is " + currentTime);
+
+    // // 1 UPDATE: update character's positions
+    // update();
+
+    // // 2 DRAW: draw the screen with updated informatios.
+    // repaint();// this is how you call the paintComponent() method
+
+    // try {
+    // double remainingTime = nextDrawTime - currentTime;
+    // remainingTime = remainingTime / 1000000; // convert remainingTime from
+    // nanoseconds to milliseconds
+
+    // if (remainingTime < 0)
+    // remainingTime = 0;
+
+    // Thread.sleep((long) remainingTime);
+
+    // nextDrawTime += drawInterval;
+
+    // } catch (InterruptedException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
+
+    // This is the second method to loop the game
     @Override
     public void run() {
 
-        
-        double drawInterval = 1000000000 / FPS; // 0.01666 seconds
-        double nextDrawTime = System.nanoTime() + drawInterval;
+        double drawInterval = 1000000000 / FPS;
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+        long timer = 0;
+        int drawCount = 0;
 
         while (gameThread != null) {
-            long currentTime = System.nanoTime(); // basic it is a time in nanoseconds
-            System.err.println("Current Time is " + currentTime);
 
-            // 1 UPDATE: update character's positions
-            update();
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += (currentTime - lastTime);
 
-            // 2 DRAW: draw the screen with updated informatios.
-            repaint();// this is how you call the paintComponent() method
+            lastTime = currentTime;
 
-            try {
-                double remainingTime = nextDrawTime - currentTime;
-                remainingTime = remainingTime / 1000000; // convert remainingTime from nanoseconds to milliseconds
+            if (delta >= 1) {
 
-                if (remainingTime < 0)
-                    remainingTime = 0;
+                // 1 UPDATE: update character's positions
+                update();
 
-                Thread.sleep((long) remainingTime);
+                // 2 DRAW: draw the screen with updated informatios.
+                repaint();// this is how you call the paintComponent() method
 
-                nextDrawTime += drawInterval;
+                delta--;
+                drawCount++;
+            }
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (timer >= 1000000000) {
+                System.out.println("FPS: " + drawCount);
+                drawCount = 0;
+                timer = 0;
             }
         }
     }
